@@ -7,9 +7,9 @@ from sklearn import model_selection
 # --------- Preprocessing ---------
 
 # Import data
-dataWhite = pd.read_csv("../Data/winequality-white_num.csv")
+dataWhite = pd.read_csv("../Data/winequality-white_string.csv")
 
-dataRed = pd.read_csv("../Data/winequality-red_num.csv")
+dataRed = pd.read_csv("../Data/winequality-red_string.csv")
 
 # Removing duplicates so that accuracy values are valid
 dataWhite = dataWhite.drop_duplicates()
@@ -24,35 +24,37 @@ xRed = np.array(dataRed.drop('quality', axis=1))
 yRed = np.array(dataRed['quality'])
 
 # Splitting into train and test sets (70/30)
-xTrainWhite, xTestWhite, yTrainWhite, yTestWhite = model_selection.train_test_split(xWhite, yWhite, test_size=0.30, random_state=42)
+xTrainWhite, xTestWhite, yTrainWhite, yTestWhite = model_selection.train_test_split(xWhite, yWhite, test_size=0.30, random_state=155)
 
-xTrainRed, xTestRed, yTrainRed, yTestRed = model_selection.train_test_split(xRed, yRed, test_size=0.30, random_state=42)
+xTrainRed, xTestRed, yTrainRed, yTestRed = model_selection.train_test_split(xRed, yRed, test_size=0.30, random_state=155)
 
 # --------- Training/testing ---------
 
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import confusion_matrix, accuracy_score, f1_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score
 import seaborn as sns
+from joblib import dump
 
-# random forest model creation
-rf = RandomForestRegressor(n_estimators=500, min_samples_split=5, random_state=42, n_jobs=-1)
 
-# Prediction
-rf.fit(xTrainWhite, yTrainWhite)
 
-predsTrain = np.around(rf.predict(xTrainWhite))
+# White Model
+rfWhite = RandomForestClassifier(n_estimators=600, min_samples_split=7, min_samples_leaf=7, max_features='sqrt', max_depth=15,
+                                bootstrap=True, class_weight="balanced")
 
-predsTest = np.around(rf.predict(xTestWhite))
+rfWhite.fit(xTrainWhite, yTrainWhite)
+
+predsTrain = rfWhite.predict(xTrainWhite)
+
+predsTest = rfWhite.predict(xTestWhite)
 
 # Prediction metrics
 print("White wine")
-print("Feature importance array:\n", rf.feature_importances_)
+print("Feature importance array:\n", rfWhite.feature_importances_)
 
 print('\n')
 
 print("=== Confusion Matrix ===")
-tickLabels = list(range(min(yWhite), max(yWhite) + 1))
-#somtimes the axis gets setup properly, sometimes it doesn't... I don't really know why
+tickLabels = ['Bad', 'Ok', 'Good', 'Great']
 sns.heatmap(confusion_matrix(yTestWhite, predsTest), yticklabels=tickLabels, xticklabels=tickLabels, square=True, annot=True, cbar=False)
 plt.xlabel('predicted value')
 plt.ylabel('true value')
@@ -60,27 +62,32 @@ plt.show()
 
 print('\n')
 
-print("Prediction accuracy: {0:.2f}%".format(accuracy_score(predsTrain, yTrainWhite) * 100))
-print("Prediction accuracy: {0:.2f}%".format(accuracy_score(predsTest, yTestWhite) * 100))
+print("Train prediction accuracy: {0:.2f}%".format(accuracy_score(predsTrain, yTrainWhite) * 100))
+print("Test prediction accuracy: {0:.2f}%".format(accuracy_score(predsTest, yTestWhite) * 100))
 
-print("Prediction f1: {0:.2f}".format(f1_score(predsTrain, yTrainWhite, average='weighted') * 100))
-print("Prediction f1: {0:.2f}".format(f1_score(predsTest, yTestWhite, average='weighted') * 100))
+print("Train prediction precision: {0:.2f}".format(precision_score(predsTrain, yTrainWhite, average='macro') * 100))
+print("Test prediction precision: {0:.2f}".format(precision_score(predsTest, yTestWhite, average='macro') * 100))
 
-# Prediction
-rf.fit(xTrainRed, yTrainRed)
+# Save weights
+dump(rfWhite, 'whiteModel.joblib')
 
-predsTrain = np.around(rf.predict(xTrainRed))
+# Red Model
+rfRed = RandomForestClassifier(n_estimators=600, min_samples_split=2, min_samples_leaf=3, max_features='auto',
+                               max_depth=10, bootstrap=True, class_weight="balanced_subsample")
 
-predsTest = np.around(rf.predict(xTestRed))
+rfRed.fit(xTrainRed, yTrainRed)
+
+predsTrain = rfRed.predict(xTrainRed)
+
+predsTest = rfRed.predict(xTestRed)
 
 # Prediction metrics
 print("Red wine")
-print("Feature importance array:\n", rf.feature_importances_)
+print("Feature importance array:\n", rfRed.feature_importances_)
 
 print('\n')
 
 print("=== Confusion Matrix ===")
-tickLabels = list(range(min(yRed), max(yRed) + 1))
 sns.heatmap(confusion_matrix(yTestRed, predsTest), yticklabels=tickLabels, xticklabels=tickLabels, square=True, annot=True, cbar=False)
 plt.xlabel('predicted value')
 plt.ylabel('true value')
@@ -88,8 +95,11 @@ plt.show()
 
 print('\n')
 
-print("Prediction accuracy: {0:.2f}%".format(accuracy_score(predsTrain, yTrainRed) * 100))
-print("Prediction accuracy: {0:.2f}%".format(accuracy_score(predsTest, yTestRed) * 100))
+print("Train prediction accuracy: {0:.2f}%".format(accuracy_score(predsTrain, yTrainRed) * 100))
+print("Test prediction accuracy: {0:.2f}%".format(accuracy_score(predsTest, yTestRed) * 100))
 
-print("Prediction f1: {0:.2f}".format(f1_score(predsTrain, yTrainRed, average='weighted') * 100))
-print("Prediction f1: {0:.2f}".format(f1_score(predsTest, yTestRed, average='weighted') * 100))
+print("Train prediction precision: {0:.2f}".format(precision_score(predsTrain, yTrainRed, average='macro') * 100))
+print("Test prediction precision: {0:.2f}".format(precision_score(predsTest, yTestRed, average='macro') * 100))
+
+# Save weights
+dump(rfRed, 'redModel.joblib')
