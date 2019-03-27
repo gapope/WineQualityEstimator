@@ -7,9 +7,9 @@ from sklearn import model_selection
 # --------- Preprocessing ---------
 
 # Import data
-dataWhite = pd.read_csv("../Data/winequality-white_string.csv")
+dataWhite = pd.read_csv("../../Data/winequality-white_string.csv")
 
-dataRed = pd.read_csv("../Data/winequality-red_string.csv")
+dataRed = pd.read_csv("../../Data/winequality-red_string.csv")
 
 # Removing duplicates so that accuracy values are valid
 dataWhite = dataWhite.drop_duplicates()
@@ -34,7 +34,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score
 import seaborn as sns
 from joblib import dump
-
 
 
 # White Model
