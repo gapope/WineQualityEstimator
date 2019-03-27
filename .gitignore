@@ -1,5 +1,6 @@
 
 *.pages
 *.doc*
-Source/venv/*
-Source/.idea/*
+*/venv/*
+*/.idea/*
+*/__pycache__/*

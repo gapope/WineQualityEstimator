@@ -1,8 +1,10 @@
-var slider = document.getElementById("myRange");
-var output = document.getElementById("demo");
-output.innerHTML = slider.value; // Display the default slider value
+// Initialize all value displays
+var i;
+for (i = 0; i < 11; i++) {
+    document.getElementById("out" + i).innerHTML = document.getElementById("in" + i).value;
+}
 
 // Update the current slider value (each time you drag the slider handle)
-function update(val) {
-    output.innerHTML = val;
+function update(val,id) {
+    document.getElementById(id).innerHTML = val;
 }

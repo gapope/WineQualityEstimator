@@ -1,28 +1,29 @@
 from flask import Flask, render_template, request
-from joblib import load
-import numpy as np
+from predictor import Predictor
+from state import Tracker
 
-'''
-model = load("redModel.joblib")
-
-print(model.predict(np.array([0.2, 3, 2.4, 0.9, 4.5, 2.5, 1.4, 5.9, 0.7, 1.2, 4.3]).reshape(1, -1)))
-'''
+# Load predictors and tracker which allow webapp functionality
+red = Predictor('model/redModel.joblib')
+white = Predictor('model/whiteModel.joblib')
+currState = Tracker()
 
 app = Flask(__name__)
 
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-
-@app.route('/estimate', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def estimate():
     if request.method == 'POST':
         #estimate quality and return it
-        return 'post'
+        if request.form['Colour'] == 'red': # Red wine selected
+            pred = red.predict(request)
+        elif request.form['Colour'] == 'white': # white wine selected
+            pred = white.predict(request)
+
+        currState.update(request, pred)
+
+        return render_template('index.html', state=currState.state)
     else:
-        return 'hello'
+        return render_template('index.html', state=currState.state)
 
 
 if __name__ == '__main__':

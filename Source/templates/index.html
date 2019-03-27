@@ -1,20 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>TEST Title</title>
         <meta charset="UTF-8">
 
-        <!-- CSS -->
-        <link rel="stylesheet" href="./static/css/main.css">
+        <!-- Tab header info -->
+        <link rel="icon" type="image/png" href="./static/img/wine.png">
+        <title>Wine quality estimator</title>
 
-        <!-- JS -->
-        <script type = "text/javascript" src="./static/js/main.js"></script>
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+        <!-- Bootstrap core CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Material Design Bootstrap -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.7.5/css/mdb.min.css" rel="stylesheet">
+        <!-- Personal css -->
+        <link rel="stylesheet" href="./static/css/main.css">
     </head>
-    <body>
-        <p>This is a test to make sure this works</p>
-        <div class="slidecontainer">
-            <input type="range" min="1" max="100" value="50" class="slider" id="myRange" oninput="update(this.value)">
-            <p>Value: <span id="demo"></span></p>
+
+    <body style="background-color:#4db6ac;">
+        <div class="container text-center py-2">
+            <h1>Wine quality estimator</h1>
         </div>
+
+        <div class="container">
+            <div class="row">
+                <!-- Input form holder -->
+                <div class="col-sm jumbotron">
+                    <form action="/" method="post">
+                        <div class="row-sm">
+                            <label for="colour" class="font-weight-bold">Wine colour</label>
+                            <div id="colour">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" id="red" name="Colour" value="red" {% if state.colour == 'red' %} checked="checked" {% endif %}/>
+                                    <label class="custom-control-label" for="red">Red</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" id="white" name="Colour" value="white" {% if state.colour == 'white' %} checked="checked" {% endif %}/>
+                                    <label class="custom-control-label" for="white">White</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Fixed acidity -->
+                        <div class="row-sm">
+                            <label for="in0" class="font-weight-bold">Fixed acidity</label>
+                            <input type="range" name="Fixed acidity" min="1" max="10" step="0.1" value="{{ state.fixed_acidity }}" class="custom-range" id="in0" oninput="update(this.value,'out0')"/>
+                            <label for="in0">Value: <span id="out0"></span></label>
+                        </div>
+
+
+                        <!-- Volatile acidity -->
+                        <div class="row-sm">
+                            <label for="in1" class="font-weight-bold">Volatile acidity</label>
+                            <input type="range" name="Volatile acidity" min="0" max="2" step="0.01" value="{{ state.volatile_acidity }}" class="custom-range" id="in1" oninput="update(this.value,'out1')"/>
+                            <label for="in1">Value: <span id="out1"></span></label>
+                        </div>
+
+
+                        <!-- Ctric acid -->
+                        <div class="row-sm">
+                            <label for="in2" class="font-weight-bold">Citric acid</label>
+                            <input type="range" name="Citric acid" min="0" max="1" step="0.01" value="{{ state.citric_acid }}" class="custom-range" id="in2" oninput="update(this.value,'out2')"/>
+                            <label for="in2">Value: <span id="out2"></span></label>
+                        </div>
+
+                        <!-- Residual sugar -->
+                        <div class="row-sm">
+                            <label for="in3" class="font-weight-bold">Residual sugar</label>
+                            <input type="range" name="Residual sugar" min="0" max="5" step="0.1" value="{{ state.residual_sugar }}" class="custom-range" id="in3" oninput="update(this.value,'out3')"/>
+                            <label for="in3">Value: <span id="out3"></span></label>
+                        </div>
+
+                        <!-- Chlorides -->
+                        <div class="row-sm">
+                            <label for="in4" class="font-weight-bold">Chlorides</label>
+                            <input type="range" name="Chlorides" min="0" max="0.1" step="0.001" value="{{ state.chlorides }}" class="custom-range" id="in4" oninput="update(this.value,'out4')"/>
+                            <label for="in4">Value: <span id="out4"></span></label>
+                        </div>
+
+                        <!-- Free sulfur -->
+                        <div class="row-sm">
+                            <label for="in5" class="font-weight-bold">Free sulfur</label>
+                            <input type="range" name="Free sulfur" min="0" max="50" step="1" value="{{ state.free_sulfur }}" class="custom-range" id="in5" oninput="update(this.value,'out5')"/>
+                            <label for="in5">Value: <span id="out5"></span></label>
+                        </div>
+
+                        <!-- Total sulfur -->
+                        <div class="row-sm">
+                            <label for="in6" class="font-weight-bold">Total sulfur</label>
+                            <input type="range" name="Total sulfur" min="0" max="250" step="1" value="{{ state.total_sulfur }}" class="custom-range" id="in6" oninput="update(this.value,'out6')"/>
+                            <label for="in6">Value: <span id="out6"></span></label>
+                        </div>
+
+                        <!-- Density -->
+                        <div class="row-sm">
+                            <label for="in7" class="font-weight-bold">Density</label>
+                            <input type="range" name="Density" min="0.9900" max="1" step="0.0001" value="{{ state.density }}" class="custom-range" id="in7" oninput="update(this.value,'out7')"/>
+                            <label for="in7">Value: <span id="out7"></span></label>
+                        </div>
+
+                        <!-- pH -->
+                        <div class="row-sm">
+                            <label for="in8" class="font-weight-bold">pH</label>
+                            <input type="range" name="pH" min="2.5" max="4" step="0.01" value="{{ state.pH }}" class="custom-range" id="in8" oninput="update(this.value,'out8')"/>
+                            <label for="in8">Value: <span id="out8"></span></label>
+                        </div>
+
+                        <!-- Sulphates -->
+                        <div class="row-sm">
+                            <label for="in9" class="font-weight-bold">Sulphates</label>
+                            <input type="range" name="Sulphates" min="0" max="2.5" step="0.01" value="{{ state.sulphates }}" class="custom-range" id="in9" oninput="update(this.value,'out9')"/>
+                            <label for="in9">Value: <span id="out9"></span></label>
+                        </div>
+
+                        <!-- Alcohol -->
+                        <div class="row-sm">
+                            <label for="in10" class="font-weight-bold">Alcohol</label>
+                            <input type="range" name="Alcohol" min="8" max="15" step="0.1" value="{{ state.alcohol }}" class="custom-range" id="in10" oninput="update(this.value,'out10')"/>
+                            <label for="in10">Value: <span id="out10"></span></label>
+                        </div>
+
+                        <div class="">
+                            <input type="submit" class="btn btn-primary" value="Submit">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Result holder -->
+                <div class="col-sm text-center">
+                    <div class="jumbotron sticky-top">
+                        {% if state.quality == '' %} <!-- Default text -->
+                            <h5>Let's make a wine!</h5>
+                        {% else %} <!-- Result text -->
+                            <span>
+                                A {{ state.colour }} wine with these properties would be {{ state.quality }} <br />
+                                Physio-chemical properties:<br /><br />
+                                <div class="propertylist">
+                                    Fixed acidity: {{ state.fixed_acidity }}<br />
+                                    Volatile acidity: {{ state.volatile_acidity }}<br />
+                                    Citric acid: {{ state.citric_acid }}<br />
+                                    Residual sugar: {{ state.residual_sugar }}<br />
+                                    Chlorides: {{ state.chlorides }}<br />
+                                    Free sulfur: {{ state.free_sulfur }}<br />
+                                    Total sulfur: {{ state.total_sulfur }}<br />
+                                    Density: {{ state.density }}<br />
+                                    pH: {{ state.pH }}<br />
+                                    Sulphates: {{ state.sulphates }}<br />
+                                    Alcohol: {{ state.alcohol }}
+                                </div>
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JS required above -->
+        <script type = "text/javascript" src="./static/js/main.js"></script>
     </body>
+
+    <footer class="page-footer font-small teal">
+            <div class="container text-center pt-3">
+                <p>Visit the github repo to see how this all works <a href="https://github.com/gapope/WineQualityEstimator"><u>here</u></a></p>
+            </div>
+            <div class="footer-copyright text-center py-3">
+                Icons made by <a href="https://www.freepik.com/"title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+            </div>
+        </footer>
 </html>
