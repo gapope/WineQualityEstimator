@@ -1,4 +1,7 @@
-flask
-joblib
 sklearn
 numpy
+pandas
+matplotlib
+seabonn
+joblib
+flask

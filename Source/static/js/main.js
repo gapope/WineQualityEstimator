@@ -1,6 +1,6 @@
 // Initialize all value displays
 var i;
-for (i = 0; i < 11; i++) {
+for (i = 0; i < 11q; i++) {
     document.getElementById("out" + i).innerHTML = document.getElementById("in" + i).value;
 }
 
