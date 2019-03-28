@@ -2,6 +2,6 @@ sklearn
 numpy
 pandas
 matplotlib
-seabonn
+seaborn
 joblib
 flask
